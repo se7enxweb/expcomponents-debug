@@ -42,12 +42,16 @@
         ]
     },
     "description": "This component provides a set of classes that help you to debug an application. It provides timers and report generators for different formats that give a summary of warnings and errors that occurred within your application.",
-    "homepage": "https://github.com/zetacomponents",
+    "homepage": "https://github.com/se7enxweb/expcomponents-debug",
     "license": "Apache-2.0",
-    "name": "zetacomponents/debug",
+    "name": "se7enxweb/expcomponents-debug",
     "type": "library",
     "require": {
-        "zetacomponents/base": "~1.8"
+        "php": ">=7.1",
+        "se7enxweb/expcomponents-base": "~1.8"
+    },
+    "replace": {
+        "zetacomponents/debug": "self.version"
     },
     "require-dev": {
         "zetacomponents/unit-test": "*"
