@@ -32,6 +32,29 @@ jobs:
           done
           exit $status
 
+      - name: Use sibling forks without a Packagist release from GitHub
+        # Changes only this checkout's composer.json, and only for a fork that has
+        # no release on Packagist yet; released forks resolve as users get them.
+        run: |
+          todo=$(jq -r '((.require // {}) + (."require-dev" // {})) | keys[] | select(startswith("se7enxweb/expcomponents-"))' composer.json)
+          seen=" "
+          while [ -n "$(echo $todo)" ]; do
+            set -- $todo; pkg=$1; shift; todo="$*"
+            case "$seen" in *" $pkg "*) continue ;; esac
+            seen="$seen$pkg "
+            name=${pkg#se7enxweb/}
+            if curl -sf -o /dev/null "https://repo.packagist.org/p2/$pkg.json"; then
+              echo "$pkg: released on Packagist"
+            else
+              url="https://github.com/se7enxweb/$name"
+              ver=$(git ls-remote --tags --refs "$url" | sed 's#.*refs/tags/##' | grep -E '^[0-9]+(\.[0-9]+)*$' | sort -V | tail -1)
+              echo "$pkg: no release on Packagist yet, using dev-master of $url as $ver"
+              composer config "repositories.$name" "{\"type\": \"vcs\", \"url\": \"$url\", \"no-api\": true}"
+              composer require --no-update --no-interaction "$pkg:dev-master as $ver"
+            fi
+            todo="$todo $(curl -sf "https://raw.githubusercontent.com/se7enxweb/$name/HEAD/composer.json" | jq -r '(.require // {}) | keys[] | select(startswith("se7enxweb/expcomponents-"))')"
+          done
+
       - name: Install dependencies
         run: composer update --no-interaction --no-progress --prefer-dist
 
