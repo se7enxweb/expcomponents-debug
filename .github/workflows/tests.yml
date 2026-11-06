@@ -1,0 +1,39 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  phpunit:
+    name: PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4', '8.5']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: bz2, dom, gd, iconv, mbstring, pdo_sqlite, posix, sqlite3, xml, zlib
+          ini-values: error_reporting=-1, display_errors=On, zend.assertions=1
+          coverage: none
+
+      - name: Lint every source file
+        run: |
+          status=0
+          for file in $(find src -name '*.php'); do
+            php -l "$file" >/dev/null || status=1
+          done
+          exit $status
+
+      - name: Install dependencies
+        run: composer update --no-interaction --no-progress --prefer-dist
+
+      - name: Run the test suite
+        run: vendor/bin/phpunit
