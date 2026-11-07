@@ -39,14 +39,14 @@ class ezcDebugTest extends ezcTestCase
 {
     private $dbg;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dbg = ezcDebug::getInstance();
         $this->dbg->reset();
         $this->dbg->setOutputFormatter( new TestReporter() );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         restore_error_handler();
     }
@@ -68,7 +68,9 @@ class ezcDebugTest extends ezcTestCase
             $this->fail( 'Exception not thrown on get access to unknown property $foobar.' );
         }
         catch ( ezcBasePropertyNotFoundException $e )
-        {}
+        {
+            $this->assertSame( "No such property name 'foobar'.", $e->getMessage() );
+        }
     }
 
     public function testSetAccessSuccess()
@@ -87,13 +89,17 @@ class ezcDebugTest extends ezcTestCase
             'options',
             array( null, true, 23, 23.42, 'foobar', array(), new stdClass )
         );
+        $this->assertEquals( new ezcDebugOptions(), $this->dbg->options, 'A refused value must not replace the options.' );
 
         try
         {
             $this->dbg->foo = 23;
             $this->fail( 'ezcBasePropertyNotFoundException not throwen on set access to non-existent property.' );
         }
-        catch ( ezcBasePropertyNotFoundException $e ) {}
+        catch ( ezcBasePropertyNotFoundException $e )
+        {
+            $this->assertSame( "No such property name 'foo'.", $e->getMessage() );
+        }
     }
 
     public function testIssetAccessSuccess()
@@ -233,6 +239,7 @@ class ezcDebugTest extends ezcTestCase
         $beforeTime = time();
 
         set_error_handler( 'testErrorHandler' );
+        $triggerLine = __LINE__ + 1;
         trigger_error( '[Paynet, templates] Cannot load template', E_USER_WARNING );
         restore_error_handler();
 
@@ -266,7 +273,7 @@ class ezcDebugTest extends ezcTestCase
         $fakeStruct[0][0]->datetime  = null;
         $fakeStruct[0][0]->verbosity = false;
         $fakeStruct[0][0]->file      = __FILE__;
-        $fakeStruct[0][0]->line      = 236;
+        $fakeStruct[0][0]->line      = $triggerLine;
 
         $this->assertEquals(
             $fakeStruct,
@@ -306,7 +313,7 @@ EOT;
  
     public static function suite()
     {
-        return new PHPUnit_Framework_TestSuite("ezcDebugTest");
+        return new \PHPUnit\Framework\TestSuite("ezcDebugTest");
     }
 }
 ?>

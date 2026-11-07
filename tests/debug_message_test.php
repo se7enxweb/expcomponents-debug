@@ -39,10 +39,10 @@ class ezcDebugMessageTest extends ezcTestCase
 {
     public static function suite()
     {
-        return new PHPUnit_Framework_TestSuite( __CLASS__ );
+        return new \PHPUnit\Framework\TestSuite( __CLASS__ );
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         $dbg = ezcDebug::getInstance();
         $dbg->reset();
@@ -54,7 +54,7 @@ class ezcDebugMessageTest extends ezcTestCase
         set_error_handler( 'testDebugMessageErrorHandler' );
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         restore_error_handler();
     }
@@ -181,7 +181,9 @@ class ezcDebugMessageTest extends ezcTestCase
     
     public function testParseMessageSeverityError()
     {
-        trigger_error( '[Source, Category] 23: Message', E_USER_ERROR );
+        // PHP 8.4 deprecates trigger_error() with E_USER_ERROR and reports
+        // that deprecation first; hand the handler the user error directly.
+        ezcDebug::debugHandler( E_USER_ERROR, '[Source, Category] 23: Message', __FILE__, __LINE__ );
 
         $out = ezcDebug::getInstance()->generateOutput();
 
@@ -205,7 +207,11 @@ class ezcDebugMessageTest extends ezcTestCase
     
     public function testParseMessageUnknownSeverity()
     {
-        trigger_error( '[Source, Category] 23: Message', 42 );
+        // trigger_error() with an unknown level (42) made PHP 7 raise this
+        // E_WARNING instead; PHP 8 throws a ValueError and calls no handler.
+        // Hand the handler the warning PHP 7 raised: a message PHP itself
+        // emits, without "[Source, Category] N:", and not a user level.
+        ezcDebug::debugHandler( E_WARNING, 'Invalid error type specified', __FILE__, __LINE__ );
 
         $out = ezcDebug::getInstance()->generateOutput();
 

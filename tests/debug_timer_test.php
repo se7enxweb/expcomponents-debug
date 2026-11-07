@@ -33,7 +33,7 @@ class ezcDebugTimerTest extends ezcTestCase
 {
     public static function suite( )
     {
-        return new PHPUnit_Framework_TestSuite( __CLASS__ );
+        return new \PHPUnit\Framework\TestSuite( __CLASS__ );
     }
 
     public function testStartStop( )
@@ -180,6 +180,16 @@ class ezcDebugTimerTest extends ezcTestCase
     public function testComfortableStructure( )
     {
         $struct = $this->getTimeData( );
+
+        // One stopped timer per stopTimer() call, in the order they stopped.
+        $names = array();
+        foreach ( $struct as $timer )
+        {
+            $this->assertInstanceOf( 'ezcDebugTimerStruct', $timer );
+            $this->assertGreaterThanOrEqual( $timer->startTime, $timer->stopTime );
+            $names[] = $timer->name;
+        }
+        $this->assertEquals( array( 'my query', 'my query', 'my query', 'Timing module', 'Script' ), $names );
     }
 
     protected function getTimeData( )
@@ -213,7 +223,10 @@ class ezcDebugTimerTest extends ezcTestCase
             echo $time->foo;
             $this->fail( 'ezcBasePropertyNotFoundException not thrown' );
         }
-        catch ( ezcBasePropertyNotFoundException $e ) {}
+        catch ( ezcBasePropertyNotFoundException $e )
+        {
+            $this->assertSame( "No such property name 'foo'.", $e->getMessage() );
+        }
     }
 
     public function testSetAccessFailure()
@@ -224,7 +237,10 @@ class ezcDebugTimerTest extends ezcTestCase
             $time->foo = 23;
             $this->fail( 'ezcBasePropertyNotFoundException not thrown' );
         }
-        catch ( ezcBasePropertyNotFoundException $e ) {}
+        catch ( ezcBasePropertyNotFoundException $e )
+        {
+            $this->assertSame( "No such property name 'foo'.", $e->getMessage() );
+        }
     }
 
     public function testStartTimerTwiceFailure()

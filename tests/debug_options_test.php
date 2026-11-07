@@ -35,7 +35,7 @@ class ezcDebugOptionsTest extends ezcTestCase
 {
     public static function suite()
     {
-        return new PHPUnit_Framework_TestSuite( __CLASS__ );
+        return new \PHPUnit\Framework\TestSuite( __CLASS__ );
     }
 
     public function testCtor()
@@ -117,6 +117,8 @@ class ezcDebugOptionsTest extends ezcTestCase
             'stackTraceMaxDepth',
             array( null, true, -23, 'foobar', array(), new stdClass() )
         );
+        // Every value above was refused, so the options keep their defaults.
+        $this->assertEquals( new ezcDebugOptions(), $opts );
     }
 }
 ?>

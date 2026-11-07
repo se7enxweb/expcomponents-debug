@@ -45,7 +45,7 @@ class ezcDebugPhpStacktraceIteratorTest extends ezcTestCase
     
     public static function suite()
     {
-        return new PHPUnit_Framework_TestSuite( __CLASS__ );
+        return new \PHPUnit\Framework\TestSuite( __CLASS__ );
     }
 
     public function testIterateTrace()
@@ -69,6 +69,12 @@ class ezcDebugPhpStacktraceIteratorTest extends ezcTestCase
 //                isset( $value['file'] )
 //            );
 
+            // The frame that calls the test method lies in PHPUnit: its line
+            // depends on the PHPUnit version, like the path does on the system.
+            if ( isset( $value['file'] ) && $value['file'] !== __FILE__ )
+            {
+                unset( $value['line'] );
+            }
             // Remove 'file' keys to not store system dependant pathes.
             unset( $value['file'] );
 

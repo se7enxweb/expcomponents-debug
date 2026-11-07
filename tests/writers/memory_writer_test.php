@@ -31,7 +31,7 @@
  */
 class ezcDebugMemoryWriterTest extends ezcTestCase
 {
-	protected function setUp()
+	protected function setUp(): void
 	{        
         date_default_timezone_set("UTC");
         $this->writer = new ezcDebugMemoryWriter();
@@ -91,7 +91,7 @@ class ezcDebugMemoryWriterTest extends ezcTestCase
 
     public static function suite()
     {
-        return new PHPUnit_Framework_TestSuite( "ezcDebugMemoryWriterTest" );
+        return new \PHPUnit\Framework\TestSuite( "ezcDebugMemoryWriterTest" );
     }
 }
 ?>

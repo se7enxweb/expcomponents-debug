@@ -13,6 +13,10 @@ Unreleased - se7enxweb/expcomponents-debug
 - Added: NOTICE keeps the upstream copyright notices and names the fork;
   README.md describes the fork.
 - Added: A GitHub Actions workflow running the test suite on PHP 7.4 to 8.5.
+- Fixed: composer.json requires se7enxweb/expcomponents-event-log. ezcDebug
+  logs through ezcLog, ezcLogFilterSet and ezcLogFilter, so it could not be
+  constructed when nothing else installed the EventLog component.
+- Updated: The test suite runs on PHPUnit 9 and PHP 7.4 to 8.5.
 
 
 1.3 - Saturday 27 September 2014
