@@ -48,7 +48,8 @@
     "type": "library",
     "require": {
         "php": ">=7.1",
-        "se7enxweb/expcomponents-base": "~1.8"
+        "se7enxweb/expcomponents-base": "~1.8",
+        "se7enxweb/expcomponents-event-log": "~1.5"
     },
     "replace": {
         "zetacomponents/debug": "self.version"
