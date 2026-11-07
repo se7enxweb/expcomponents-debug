@@ -43,12 +43,14 @@ jobs:
             case "$seen" in *" $pkg "*) continue ;; esac
             seen="$seen$pkg "
             name=${pkg#se7enxweb/}
-            if curl -sf -o /dev/null "https://repo.packagist.org/p2/$pkg.json"; then
-              echo "$pkg: released on Packagist"
+            # Packagist also lists the upstream tags the fork inherited; only a
+            # newest tag that replaces the zetacomponents name is a fork release.
+            if curl -sf "https://repo.packagist.org/p2/$pkg.json" | jq -e --arg p "$pkg" --arg z "zetacomponents/${name#expcomponents-}" '.packages[$p][0].replace // {} | has($z)' >/dev/null; then
+              echo "$pkg: fork release on Packagist"
             else
               url="https://github.com/se7enxweb/$name"
               ver=$(git ls-remote --tags --refs "$url" | sed 's#.*refs/tags/##' | grep -E '^[0-9]+(\.[0-9]+)*$' | sort -V | tail -1)
-              echo "$pkg: no release on Packagist yet, using dev-master of $url as $ver"
+              echo "$pkg: no fork release on Packagist yet, using dev-master of $url as $ver"
               composer config "repositories.$name" "{\"type\": \"vcs\", \"url\": \"$url\", \"no-api\": true}"
               composer require --no-update --no-interaction "$pkg:dev-master as $ver"
             fi
