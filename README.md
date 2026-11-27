@@ -2,7 +2,7 @@
 
 This component provides a set of classes that help you to debug an application. It provides timers and report generators for different formats that give a summary of warnings and errors that occurred within your application.
 
-This is the Exponential fork of [zetacomponents/Debug](https://github.com/zetacomponents/Debug),
+This is the Exponential Components fork of [zetacomponents/Debug](https://github.com/zetacomponents/Debug),
 maintained by 7x (se7en.x) and the Exponential Foundation for Exponential and anyone else
 who uses the Zeta Components Debug component on current PHP versions. All credit for the
 component goes to the Zeta Components authors listed in `composer.json` and `CREDITS`;
